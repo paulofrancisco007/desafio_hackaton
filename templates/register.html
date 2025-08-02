@@ -1,16 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>GovDocs RN</title>
-</head>
-<body>
-    <h1>Cadastro</h1>
-    <form method="POST">
-        <input name="username" placeholder="Usuário" required><br>
-        <input name="password" type="password" placeholder="Senha" required><br>
-    <button type="submit">Registrar</button>
-    </form>
-    <a href="/">Voltar</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Cadastro</h2>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('register') }}">
+  <div>
+    <label>Usuário:</label>
+    <input type="text" name="username" required>
+  </div>
+  <div>
+    <label>Senha:</label>
+    <input type="password" name="password" required>
+  </div>
+  <button type="submit">Cadastrar</button>
+</form>
+<p>Já tem conta? <a href="{{ url_for('login') }}">Faça login</a></p>
+{% endblock %}

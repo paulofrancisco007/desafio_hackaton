@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Verificar Documento</title>
-</head>
-<body>
-  <h1>Verificar Autenticidade</h1>
-  <form method="POST" enctype="multipart/form-data">
-    <input type="file" name="document" required>
-    <button type="submit">Verificar</button>
-  </form>
-  <a href="/">Voltar</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Verificar Documento</h2>
+    <form method="POST" enctype="multipart/form-data" class="mt-3">
+        <div class="mb-3">
+            <label for="document" class="form-label">Selecione o documento:</label>
+            <input type="file" class="form-control" id="document" name="document" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Verificar Autenticidade</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>GovDocs RN</title>
+    <title>GovDocsRN</title>
 </head>
 <body>
-<h1>Bem-vindo ao GovDocs RN</h1>
     {% if user %}
-        <p>Olá, {{ user }}! <a href="/logout">Sair</a></p>
-        <a href="/upload">Enviar Documento</a><br>
-        <a href="/verify">Verificar Documento</a>
+        <h1>Bem-vindo, {{ user }}!</h1>
+        <a href="{{ url_for('upload') }}">Upload de Documento</a><br>
+        <a href="{{ url_for('verify') }}">Verificar Documento</a><br>
+        <a href="{{ url_for('logout') }}">Sair</a>
     {% else %}
-        <p><a href="/login">Login</a> ou <a href="/register">Criar conta</a></p>
+        <h1>GovDocsRN - Sistema de Documentos</h1>
+        <a href="{{ url_for('login') }}">Login</a><br>
+        <a href="{{ url_for('register') }}">Registrar</a>
     {% endif %}
 </body>
 </html>
