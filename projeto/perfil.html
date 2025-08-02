@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Portal de Documentos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --gov-br-blue: #1351b4;
+      --gov-br-blue-dark: #0d3a7a;
+      --gov-br-yellow: #fbc02d;
+      --gov-br-light: #f5f5f5;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--gov-br-light);
+    }
+
+    .profile-container {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+
+    .profile-header {
+      background-color: var(--gov-br-blue);
+      color: white;
+      padding: 1.5rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      text-align: center;
+    }
+
+    .profile-body {
+      padding: 2rem;
+      background-color: white;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .profile-picture {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-picture-container {
+      position: relative;
+      width: fit-content;
+      margin: -75px auto 1rem;
+    }
+
+    .profile-picture-edit {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: var(--gov-br-blue);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+
+    .profile-picture-edit:hover {
+      background-color: var(--gov-br-blue-dark);
+    }
+
+    .info-item {
+      margin-bottom: 1.5rem;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .btn-primary {
+      background-color: var(--gov-br-blue);
+      border-color: var(--gov-br-blue);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--gov-br-blue-dark);
+      border-color: var(--gov-br-blue-dark);
+    }
+
+    @media (max-width: 768px) {
+      .profile-picture {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .profile-picture-container {
+        margin: -60px auto 1rem;
+      }
+    }
+
+        .navbar {
+      background-color: var(--gov-br-blue);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .search-form {
+      max-width: 400px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      color: white;
+      margin-left: 1rem;
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .user-info .dropdown-toggle::after {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-file-earmark-lock-fill me-2"></i>PORTAL DOGERN
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="tela.html"><i class="bi bi-house-door me-1"></i> Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-info-circle me-1"></i> Sobre</a>
+          </li>
+        </ul>
+        
+        <form class="d-flex search-form">
+          <div class="input-group">
+            <input class="form-control" type="search" placeholder="Buscar documentos..." aria-label="Search">
+            <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+          </div>
+        </form>
+        
+        <div class="user-info dropdown">
+          <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+            <img src="https://ui-avatars.com/api/?name=J+Silva&background=fff&color=1351b4" alt="Usuário">
+            <span>João Silva</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="profile-container">
+    <div class="card shadow-sm">
+      <div class="profile-header">
+        <h4>Meu Perfil</h4>
+      </div>
+      
+      <div class="profile-body">
+        <div class="profile-picture-container">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+               alt="Foto de perfil" 
+               class="profile-picture" 
+               id="profilePicture">
+          <div class="profile-picture-edit" data-bs-toggle="modal" data-bs-target="#pictureModal">
+            <i class="bi bi-camera"></i>
+          </div>
+        </div>
+
+        <div class="text-center mb-4">
+          <h3>João da Silva</h3>
+          <p class="text-muted">Servidor Público - Prefeitura de Natal</p>
+        </div>
+
+        <!-- Seção de Informações Pessoais -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Dados Pessoais</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editPersonalModal">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </button>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 info-item">
+              <div class="info-label">Nome Completo</div>
+              <div class="info-value">João da Silva</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">CPF</div>
+              <div class="info-value">123.456.789-00</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">Data de Nascimento</div>
+              <div class="info-value">15/03/1985</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">Gênero</div>
+              <div class="info-value">Masculino</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Contato -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Contato</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editContactModal">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </button>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 info-item">
+              <div class="info-label">E-mail</div>
+              <div class="info-value">joao.silva@example.com</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">Telefone</div>
+              <div class="info-value">(84) 98765-4321</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Endereço -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Endereço</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </button>
+          </div>
+          
+          <div class="row">
+            <div class="col-12 info-item">
+              <div class="info-label">Logradouro</div>
+              <div class="info-value">Rua das Flores, 123 - Apto 101</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">Bairro</div>
+              <div class="info-value">Centro</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">Cidade/Estado</div>
+              <div class="info-value">Natal/RN</div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">CEP</div>
+              <div class="info-value">59000-000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alterar Foto -->
+  <div class="modal fade" id="pictureModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Alterar Foto de Perfil</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+               alt="Foto atual" 
+               class="rounded-circle mb-3" 
+               width="120" 
+               height="120"
+               id="currentPicture">
+          
+          <button class="btn btn-outline-primary w-100 mb-2" onclick="document.getElementById('uploadPicture').click()">
+            <i class="bi bi-upload me-1"></i>Enviar Nova Foto
+          </button>
+          <input type="file" id="uploadPicture" accept="image/*" class="d-none">
+          
+          <button class="btn btn-outline-danger w-100" id="removePictureBtn">
+            <i class="bi bi-trash me-1"></i>Remover Foto
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="savePictureBtn">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Dados Pessoais -->
+  <div class="modal fade" id="editPersonalModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Dados Pessoais</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="editFullName" class="form-label">Nome Completo</label>
+              <input type="text" class="form-control" id="editFullName" value="João da Silva">
+            </div>
+            <div class="mb-3">
+              <label for="editCpf" class="form-label">CPF</label>
+              <input type="text" class="form-control" id="editCpf" value="123.456.789-00" disabled>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editBirthDate" class="form-label">Data de Nascimento</label>
+                <input type="date" class="form-control" id="editBirthDate" value="1985-03-15">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editGender" class="form-label">Gênero</label>
+                <select class="form-select" id="editGender">
+                  <option value="male" selected>Masculino</option>
+                  <option value="female">Feminino</option>
+                  <option value="other">Outro</option>
+                  <option value="none">Prefiro não informar</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Contato -->
+  <div class="modal fade" id="editContactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Contato</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="editEmail" class="form-label">E-mail</label>
+              <input type="email" class="form-control" id="editEmail" value="joao.silva@example.com">
+            </div>
+            <div class="mb-3">
+              <label for="editPhone" class="form-label">Telefone</label>
+              <input type="tel" class="form-control" id="editPhone" value="(84) 98765-4321">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Endereço -->
+  <div class="modal fade" id="editAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Endereço</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <label for="editStreet" class="form-label">Logradouro</label>
+                <input type="text" class="form-control" id="editStreet" value="Rua das Flores">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="editNumber" class="form-label">Número</label>
+                <input type="text" class="form-control" id="editNumber" value="123">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editComplement" class="form-label">Complemento</label>
+              <input type="text" class="form-control" id="editComplement" value="Apto 101">
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editDistrict" class="form-label">Bairro</label>
+                <input type="text" class="form-control" id="editDistrict" value="Centro">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editCity" class="form-label">Cidade</label>
+                <input type="text" class="form-control" id="editCity" value="Natal">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editState" class="form-label">Estado</label>
+                <select class="form-select" id="editState">
+                  <option value="RN" selected>Rio Grande do Norte</option>
+                  <!-- Outros estados -->
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editZip" class="form-label">CEP</label>
+                <input type="text" class="form-control" id="editZip" value="59000-000">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Funções para manipulação da foto de perfil
+    document.getElementById('uploadPicture').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          document.getElementById('currentPicture').src = event.target.result;
+          document.getElementById('profilePicture').src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remover foto de perfil
+    document.getElementById('removePictureBtn').addEventListener('click', function() {
+      const defaultAvatar = 'https://ui-avatars.com/api/?name=J+Silva&background=fff&color=1351b4&size=200';
+      document.getElementById('currentPicture').src = defaultAvatar;
+      document.getElementById('profilePicture').src = defaultAvatar;
+    });
+
+    // Salvar nova foto de perfil
+    document.getElementById('savePictureBtn').addEventListener('click', function() {
+      // Fechar o modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('pictureModal'));
+      modal.hide();
+      
+      // Mostrar mensagem de sucesso
+      alert('Foto de perfil atualizada com sucesso!');
+    });
+
+    // Máscaras para campos de formulário
+    document.getElementById('editPhone').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 0) {
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+      }
+      if (value.length > 10) {
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      }
+      if (value.length > 15) {
+        value = value.substring(0, 15);
+      }
+      e.target.value = value;
+    });
+
+    document.getElementById('editZip').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) {
+        value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+      }
+      if (value.length > 9) {
+        value = value.substring(0, 9);
+      }
+      e.target.value = value;
+    });
+  </script>
+</body>
+
+</html>

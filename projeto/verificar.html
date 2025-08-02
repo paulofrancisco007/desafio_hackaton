@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificação de Documentos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --gov-br-blue: #1351b4;
+      --gov-br-blue-dark: #0d3a7a;
+      --gov-br-yellow: #fbc02d;
+      --gov-br-light: #f5f5f5;
+      --gov-br-green: #2e7d32;
+      --gov-br-red: #c62828;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--gov-br-light);
+    }
+
+    .verification-container {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+
+    .verification-card {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .verification-header {
+      background-color: var(--gov-br-blue);
+      color: white;
+      padding: 1.5rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .verification-body {
+      padding: 2rem;
+      background-color: white;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .verification-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .verification-success {
+      color: var(--gov-br-green);
+    }
+
+    .verification-warning {
+      color: var(--gov-br-yellow);
+    }
+
+    .verification-danger {
+      color: var(--gov-br-red);
+    }
+
+    .verification-steps {
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .step {
+      display: flex;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--gov-br-blue);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    .step-content {
+      flex-grow: 1;
+    }
+
+    .step-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-description {
+      color: #666;
+    }
+
+    .step.completed .step-number {
+      background-color: var(--gov-br-green);
+    }
+
+    .step.failed .step-number {
+      background-color: var(--gov-br-red);
+    }
+
+    .document-preview {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      background-color: #f9f9f9;
+    }
+
+    .document-metadata {
+      margin-top: 1.5rem;
+    }
+
+    .metadata-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+    }
+
+    .metadata-label {
+      font-weight: 600;
+      width: 120px;
+      color: #666;
+    }
+
+    .metadata-value {
+      flex-grow: 1;
+    }
+
+    .verification-result {
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .result-valid {
+      background-color: rgba(46, 125, 50, 0.1);
+      border-left: 4px solid var(--gov-br-green);
+    }
+
+    .result-invalid {
+      background-color: rgba(198, 40, 40, 0.1);
+      border-left: 4px solid var(--gov-br-red);
+    }
+
+    .result-pending {
+      background-color: rgba(253, 216, 53, 0.1);
+      border-left: 4px solid var(--gov-br-yellow);
+    }
+
+    .btn-primary {
+      background-color: var(--gov-br-blue);
+      border-color: var(--gov-br-blue);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--gov-br-blue-dark);
+      border-color: var(--gov-br-blue-dark);
+    }
+
+    .upload-area {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-area:hover {
+      border-color: var(--gov-br-blue);
+      background-color: rgba(19, 81, 180, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--gov-br-blue);
+      margin-bottom: 1rem;
+    }
+
+    .verification-method {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .verification-method:hover {
+      border-color: var(--gov-br-blue);
+      background-color: rgba(19, 81, 180, 0.05);
+    }
+
+    .verification-method.active {
+      border-color: var(--gov-br-blue);
+      background-color: rgba(19, 81, 180, 0.1);
+    }
+
+    .method-icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+      color: var(--gov-br-blue);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="verification-container">
+    <div class="verification-card">
+      <div class="verification-header">
+        <h4><i class="bi bi-file-earmark-check me-2"></i> Verificação de Documentos</h4>
+        <p class="mb-0">Confira a autenticidade e integridade de documentos públicos</p>
+      </div>
+      
+      <div class="verification-body">
+        <!-- Seção de Upload (etapa 1) -->
+        <div id="uploadSection">
+          <h5 class="mb-3">1. Selecione o documento para verificação</h5>
+          <p>Envie o documento que deseja verificar ou cole o código de verificação único.</p>
+          
+          <div class="upload-area" id="dropArea">
+            <div class="upload-icon">
+              <i class="bi bi-file-earmark-arrow-up"></i>
+            </div>
+            <h5>Arraste e solte o arquivo aqui</h5>
+            <p class="text-muted">ou clique para selecionar</p>
+            <input type="file" id="fileInput" class="d-none" accept=".pdf,.jpg,.jpeg,.png">
+            <button type="button" class="btn btn-outline-primary mt-2" onclick="document.getElementById('fileInput').click()">
+              <i class="bi bi-folder2-open me-2"></i>Selecionar Arquivo
+            </button>
+          </div>
+          
+          <div class="text-center my-3">
+            <p class="text-muted">OU</p>
+          </div>
+          
+          <div class="mb-3">
+            <label for="verificationCode" class="form-label">Código de Verificação</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="verificationCode" placeholder="Digite o código de 12 caracteres">
+              <button class="btn btn-primary" type="button" id="verifyCodeBtn">
+                <i class="bi bi-search me-1"></i>Verificar
+              </button>
+            </div>
+          </div>
+          
+         <div class="d-grid gap-2 mt-4">
+            <button class="btn btn-primary" id="proceedToMethodBtn" disabled>
+              Continuar <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+              <i class="bi bi-arrow-left me-2"></i>Voltar
+            </button>
+          </div>
+        </div>
+        
+        <!-- Seção de Método de Verificação (etapa 2) - Inicialmente oculta -->
+        <div id="methodSection" class="d-none">
+          <h5 class="mb-3">2. Escolha o método de verificação</h5>
+          <p>Selecione como deseja verificar a autenticidade do documento:</p>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="verification-method" data-method="blockchain">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-link-45deg method-icon"></i>
+                  <div>
+                    <h6 class="mb-1">Verificação por Blockchain</h6>
+                    <p class="mb-0 text-muted">Confirme a integridade através do registro imutável</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="verification-method" data-method="assinatura">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-pen method-icon"></i>
+                  <div>
+                    <h6 class="mb-1">Verificação por Assinatura</h6>
+                    <p class="mb-0 text-muted">Valide as assinaturas digitais no documento</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="verification-method" data-method="qrCode">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-qr-code method-icon"></i>
+                  <div>
+                    <h6 class="mb-1">Verificação por QR Code</h6>
+                    <p class="mb-0 text-muted">Digitalize o código de verificação no documento</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="verification-method" data-method="ia">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-robot method-icon"></i>
+                  <div>
+                    <h6 class="mb-1">Análise por IA</h6>
+                    <p class="mb-0 text-muted">Detecção de alterações e inconsistências</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" id="backToUploadBtn">
+              <i class="bi bi-arrow-left me-2"></i>Voltar
+            </button>
+            <button class="btn btn-primary" id="proceedToVerifyBtn" disabled>
+              Verificar Documento <i class="bi bi-check-circle ms-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Seção de Resultados (etapa 3) - Inicialmente oculta -->
+        <div id="resultSection" class="d-none">
+          <div class="text-center mb-4">
+            <div class="verification-icon verification-success">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h3>Documento Verificado com Sucesso!</h3>
+            <p class="lead">O documento é autêntico e não sofreu alterações.</p>
+          </div>
+          
+          <div class="verification-steps">
+            <div class="step completed">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-title">Documento carregado</div>
+                <div class="step-description">Contrato_Serviços_2025.pdf</div>
+              </div>
+            </div>
+            <div class="step completed">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-title">Método de verificação selecionado</div>
+                <div class="step-description">Validação por Blockchain</div>
+              </div>
+            </div>
+            <div class="step completed">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-title">Hash do documento confirmado</div>
+                <div class="step-description">a1b2c3d4e5f6...7890</div>
+              </div>
+            </div>
+            <div class="step completed">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <div class="step-title">Assinaturas validadas</div>
+                <div class="step-description">3 assinaturas verificadas</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="verification-result result-valid">
+            <h5><i class="bi bi-check-circle-fill me-2"></i>Resultado da Verificação</h5>
+            <p>Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.</p>
+          </div>
+          
+          <div class="document-preview">
+            <h6>Informações do Documento</h6>
+            <div class="document-metadata">
+              <div class="metadata-item">
+                <div class="metadata-label">Título:</div>
+                <div class="metadata-value">Contrato de Prestação de Serviços 2025</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Tipo:</div>
+                <div class="metadata-value">Contrato Administrativo</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Número:</div>
+                <div class="metadata-value">045/2025</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Órgão:</div>
+                <div class="metadata-value">Prefeitura Municipal de Natal</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Data:</div>
+                <div class="metadata-value">10/07/2025</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Código:</div>
+                <div class="metadata-value">DOC-RN-2025-7A8B9C</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" id="newVerificationBtn">
+              <i class="bi bi-arrow-repeat me-2"></i>Nova Verificação
+            </button>
+            <div>
+              <button class="btn btn-outline-primary me-2">
+                <i class="bi bi-download me-2"></i>Baixar Relatório
+              </button>
+              <button class="btn btn-primary">
+                <i class="bi bi-printer me-2"></i>Imprimir Certificado
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Variáveis de estado
+    let currentFile = null;
+    let selectedMethod = null;
+    
+    // Elementos da interface
+    const uploadSection = document.getElementById('uploadSection');
+    const methodSection = document.getElementById('methodSection');
+    const resultSection = document.getElementById('resultSection');
+    const proceedToMethodBtn = document.getElementById('proceedToMethodBtn');
+    const proceedToVerifyBtn = document.getElementById('proceedToVerifyBtn');
+    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+    const backToUploadBtn = document.getElementById('backToUploadBtn');
+    const newVerificationBtn = document.getElementById('newVerificationBtn');
+    const fileInput = document.getElementById('fileInput');
+    const dropArea = document.getElementById('dropArea');
+    const verificationMethods = document.querySelectorAll('.verification-method');
+    
+    // Evento de seleção de arquivo
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        currentFile = e.target.files[0];
+        proceedToMethodBtn.disabled = false;
+        
+        // Atualizar a área de upload para mostrar o arquivo selecionado
+        dropArea.innerHTML = `
+          <div class="upload-icon text-success">
+            <i class="bi bi-file-earmark-check"></i>
+          </div>
+          <h5>${currentFile.name}</h5>
+          <p class="text-muted">${formatFileSize(currentFile.size)}</p>
+          <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="resetUpload()">
+            <i class="bi bi-x me-1"></i>Alterar arquivo
+          </button>
+        `;
+      }
+    });
+    
+    // Evento para verificar código
+    verifyCodeBtn.addEventListener('click', function() {
+      const code = document.getElementById('verificationCode').value.trim();
+      if (code.length === 12) {
+        // Simular verificação do código
+        simulateVerification(code);
+      } else {
+        alert('Por favor, insira um código de verificação válido de 12 caracteres.');
+      }
+    });
+    
+    // Evento para continuar para seleção de método
+    proceedToMethodBtn.addEventListener('click', function() {
+      uploadSection.classList.add('d-none');
+      methodSection.classList.remove('d-none');
+    });
+    
+    // Evento para voltar ao upload
+    backToUploadBtn.addEventListener('click', function() {
+      methodSection.classList.add('d-none');
+      uploadSection.classList.remove('d-none');
+    });
+    
+    // Evento para nova verificação
+    newVerificationBtn.addEventListener('click', function() {
+      resultSection.classList.add('d-none');
+      uploadSection.classList.remove('d-none');
+      resetUpload();
+    });
+    
+    // Evento para selecionar método de verificação
+    verificationMethods.forEach(method => {
+      method.addEventListener('click', function() {
+        // Remover classe active de todos os métodos
+        verificationMethods.forEach(m => m.classList.remove('active'));
+        
+        // Adicionar classe active ao método selecionado
+        this.classList.add('active');
+        selectedMethod = this.getAttribute('data-method');
+        proceedToVerifyBtn.disabled = false;
+      });
+    });
+    
+    // Evento para iniciar verificação
+    proceedToVerifyBtn.addEventListener('click', function() {
+      methodSection.classList.add('d-none');
+      resultSection.classList.remove('d-none');
+      
+      // Simular processo de verificação
+      simulateVerificationProcess();
+    });
+    
+    // Função para resetar o upload
+    function resetUpload() {
+      currentFile = null;
+      fileInput.value = '';
+      proceedToMethodBtn.disabled = true;
+      
+      // Restaurar a área de upload ao estado original
+      dropArea.innerHTML = `
+        <div class="upload-icon">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+        </div>
+        <h5>Arraste e solte o arquivo aqui</h5>
+        <p class="text-muted">ou clique para selecionar</p>
+        <button type="button" class="btn btn-outline-primary mt-2" onclick="document.getElementById('fileInput').click()">
+          <i class="bi bi-folder2-open me-2"></i>Selecionar Arquivo
+        </button>
+      `;
+    }
+    
+    // Função para formatar tamanho do arquivo
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Função para simular verificação por código
+    function simulateVerification(code) {
+      // Mostrar loading
+      verifyCodeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Verificando...';
+      verifyCodeBtn.disabled = true;
+      
+      // Simular tempo de verificação
+      setTimeout(() => {
+        // Aqui você normalmente faria uma requisição AJAX para verificar o código
+        // Estamos simulando um código válido para demonstração
+        if (code === 'DOCRN2025ABC' || code === '123456789XYZ') {
+          uploadSection.classList.add('d-none');
+          resultSection.classList.remove('d-none');
+          
+          // Configurar resultado para código verificado
+          document.querySelector('.verification-icon').className = 'verification-icon verification-success';
+          document.querySelector('.verification-icon i').className = 'bi bi-check-circle-fill';
+          document.querySelector('#resultSection h3').textContent = 'Documento Verificado com Sucesso!';
+          document.querySelector('#resultSection .lead').textContent = 'O documento é autêntico e não sofreu alterações.';
+          document.querySelector('.verification-result').className = 'verification-result result-valid';
+          document.querySelector('.verification-result h5 i').className = 'bi bi-check-circle-fill me-2';
+          document.querySelector('.verification-result p').innerHTML = 'Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.';
+          
+          // Configurar metadados do documento
+          document.querySelector('.metadata-value:nth-child(1)').textContent = 'Contrato de Prestação de Serviços 2025';
+          document.querySelector('.metadata-value:nth-child(2)').textContent = 'Contrato Administrativo';
+          document.querySelector('.metadata-value:nth-child(3)').textContent = '045/2025';
+          document.querySelector('.metadata-value:nth-child(4)').textContent = 'Prefeitura Municipal de Natal';
+          document.querySelector('.metadata-value:nth-child(5)').textContent = '10/07/2025';
+          document.querySelector('.metadata-value:nth-child(6)').textContent = code;
+        } else {
+          alert('Código de verificação inválido. Por favor, tente novamente.');
+        }
+        
+        // Restaurar botão
+        verifyCodeBtn.innerHTML = '<i class="bi bi-search me-1"></i>Verificar';
+        verifyCodeBtn.disabled = false;
+      }, 1500);
+    }
+    
+    // Função para simular processo de verificação
+    function simulateVerificationProcess() {
+      // Mostrar loading
+      proceedToVerifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Verificando...';
+      proceedToVerifyBtn.disabled = true;
+      
+      // Simular tempo de verificação
+      setTimeout(() => {
+        // Aqui você normalmente faria a verificação real do documento
+        // Estamos simulando um resultado positivo para demonstração
+        
+        // Configurar etapas de verificação
+        const steps = document.querySelectorAll('.step');
+        steps.forEach(step => step.classList.add('completed'));
+        
+        // Configurar resultado
+        document.querySelector('.verification-icon').className = 'verification-icon verification-success';
+        document.querySelector('.verification-icon i').className = 'bi bi-check-circle-fill';
+        document.querySelector('#resultSection h3').textContent = 'Documento Verificado com Sucesso!';
+        document.querySelector('#resultSection .lead').textContent = 'O documento é autêntico e não sofreu alterações.';
+        document.querySelector('.verification-result').className = 'verification-result result-valid';
+        document.querySelector('.verification-result h5 i').className = 'bi bi-check-circle-fill me-2';
+        document.querySelector('.verification-result p').innerHTML = 'Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.';
+        
+        // Configurar metadados do documento
+        document.querySelector('.metadata-value:nth-child(1)').textContent = currentFile.name.replace('.pdf', '').replace(/_/g, ' ');
+        document.querySelector('.metadata-value:nth-child(2)').textContent = 'Documento Oficial';
+        document.querySelector('.metadata-value:nth-child(3)').textContent = 'DOC-' + Math.floor(Math.random() * 1000);
+        document.querySelector('.metadata-value:nth-child(4)').textContent = 'Órgão Público do RN';
+        document.querySelector('.metadata-value:nth-child(5)').textContent = new Date().toLocaleDateString();
+        document.querySelector('.metadata-value:nth-child(6)').textContent = 'DOC-RN-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        
+        // Restaurar botão
+        proceedToVerifyBtn.innerHTML = 'Verificar Documento <i class="bi bi-check-circle ms-2"></i>';
+        proceedToVerifyBtn.disabled = false;
+      }, 2000);
+    }
+    
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+      dropArea.classList.add('bg-light');
+    }
+    
+    function unhighlight() {
+      dropArea.classList.remove('bg-light');
+    }
+    
+    dropArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      
+      if (files.length > 0) {
+        fileInput.files = files;
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
+      }
+    }
+  </script>
+</body>
+
+</html>
