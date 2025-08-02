@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>GovDocs RN</title>
+</head>
+<body>
+<h1>Bem-vindo ao GovDocs RN</h1>
+    {% if user %}
+        <p>Olá, {{ user }}! <a href="/logout">Sair</a></p>
+        <a href="/upload">Enviar Documento</a><br>
+        <a href="/verify">Verificar Documento</a>
+    {% else %}
+        <p><a href="/login">Login</a> ou <a href="/register">Criar conta</a></p>
+    {% endif %}
+</body>
+</html>
