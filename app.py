@@ -3,8 +3,10 @@ import hashlib
 import json
 from datetime import datetime, timedelta
 from functools import wraps
+from OpenSSL import crypto
+from endesive import pdf
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
 import mysql.connector
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,6 +15,7 @@ import numpy as np
 from PIL import Image
 import piexif
 from PyPDF2 import PdfReader
+
 
 # ===== Configuração do Flask =====
 app = Flask(__name__)
@@ -23,7 +26,9 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=1))
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=1),
+    MAX_SIGN_SIZE=10 * 1024 * 1024  # 10MB para certificados
+)
     
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -35,7 +40,6 @@ DB_CONFIG = {
     'database': os.environ.get('DB_NAME', 'govdocs')
 }
 
-# ===== Decorators =====
 # ===== Decorators =====
 def login_required(f):
     @wraps(f)
@@ -80,7 +84,7 @@ def init_database():
             )
         """)
         
-        # Tabela de documentos
+        # Tabela de documentos (atualizada para suportar assinatura)
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS documentos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,7 +94,12 @@ def init_database():
                 user_id INT NOT NULL,
                 upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 metadata JSON,
-                FOREIGN KEY (user_id) REFERENCES usuarios(id)
+                is_signed BOOLEAN DEFAULT FALSE,
+                signed_by INT NULL,
+                signed_at TIMESTAMP NULL,
+                signature_info JSON,
+                FOREIGN KEY (user_id) REFERENCES usuarios(id),
+                FOREIGN KEY (signed_by) REFERENCES usuarios(id)
             )
         """)
         
@@ -105,6 +114,7 @@ def init_database():
                 FOREIGN KEY (user_id) REFERENCES usuarios(id)
             )
         """)
+        
         
         # Cria usuário admin padrão se não existir
         cursor.execute("SELECT id FROM usuarios WHERE username = 'admin'")
@@ -128,15 +138,15 @@ def get_db():
     """Retorna uma conexão com o banco de dados"""
     return mysql.connector.connect(**DB_CONFIG)
 
-def log_audit(user_id, action, description):
+def log_audit(user_id, action, description, extra_data=None):
     """Registra ação na auditoria"""
     try:
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO auditoria (user_id, acao, descricao)
-            VALUES (%s, %s, %s)
-        """, (user_id, action, description))
+            INSERT INTO auditoria (user_id, acao, descricao, extra_data)
+            VALUES (%s, %s, %s, %s)
+        """, (user_id, action, description, json.dumps(extra_data) if extra_data else None))
         conn.commit()
     except Exception as e:
         print(f"Erro ao registrar auditoria: {e}")
@@ -207,6 +217,16 @@ def detect_tampering(original_path, uploaded_path):
         print(f"Erro na detecção de adulteração: {e}")
         return False
 
+def verify_signature(filepath):
+    """Verifica assinatura digital em PDF"""
+    try:
+        with open(filepath, 'rb') as f:
+            data = f.read()
+        return pdf.verify(data)
+    except Exception as e:
+        print(f"Erro na verificação de assinatura: {e}")
+        return False
+
 # ===== Context Processors =====
 @app.context_processor
 def inject_globals():
@@ -222,7 +242,7 @@ def index():
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT d.id, d.original_filename, d.upload_date 
+            SELECT d.id, d.original_filename, d.upload_date, d.is_signed 
             FROM documentos d
             WHERE d.user_id = %s 
             ORDER BY d.upload_date DESC LIMIT 5
@@ -357,7 +377,8 @@ def upload():
             log_audit(
                 session['user_id'], 
                 'UPLOAD', 
-                f"Documento enviado: {original_filename} (Hash: {file_hash})"
+                f"Documento enviado: {original_filename}",
+                {'hash': file_hash}
             )
             
             flash('Documento enviado com sucesso!', 'success')
@@ -372,6 +393,81 @@ def upload():
             conn.close()
     
     return render_template('upload.html')
+
+@app.route('/document/<int:doc_id>/sign', methods=['GET', 'POST'])
+@login_required
+def sign_document(doc_id):
+    if request.method == 'GET':
+        return render_template('sign.html', doc_id=doc_id)
+    
+    # Configuração do GPG (diretório padrão ou customizado)
+    gpg = gnupg.GPG(gnupghome=os.path.join(os.getcwd(), 'gnupg'))
+    os.makedirs(gpg.gnupghome, exist_ok=True)
+
+    # Verifica se o usuário já tem uma chave GPG
+    user_keys = gpg.list_keys()
+    if not user_keys:
+        # Cria uma chave GPG para o usuário (se não existir)
+        key_input = gpg.gen_key_input(
+            name_email=f"{session['user']}@govdocsrn.com",
+            passphrase='senha_padrao',  # Em produção, peça ao usuário!
+            key_type='RSA',
+            key_length=2048
+        )
+        gpg.gen_key(key_input)
+
+    # Obtém o documento do banco de dados
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT filename, original_filename FROM documentos 
+        WHERE id = %s AND user_id = %s
+    """, (doc_id, session['user_id']))
+    document = cursor.fetchone()
+    
+    if not document:
+        flash('Documento não encontrado ou acesso negado', 'danger')
+        return redirect(url_for('index'))
+
+    # Caminhos dos arquivos
+    original_path = os.path.join(app.config['UPLOAD_FOLDER'], document['filename'])
+    signed_filename = f"signed_{document['filename']}.asc"
+    signed_path = os.path.join(app.config['UPLOAD_FOLDER'], signed_filename)
+
+    # Assina o documento com GPG
+    with open(original_path, 'rb') as f:
+        signed_data = gpg.sign_file(
+            f,
+            keyid=session['user'],
+            passphrase='senha_padrao',  # Substitua por input do usuário!
+            detach=True,
+            output=signed_path
+        )
+
+    # Atualiza o banco de dados
+    cursor.execute("""
+        UPDATE documentos SET
+            is_signed = TRUE,
+            signed_by = %s,
+            signed_at = NOW(),
+            signature_info = %s,
+            filename = %s
+        WHERE id = %s
+    """, (
+        session['user_id'],
+        json.dumps({
+            'method': 'GPG',
+            'key_id': user_keys[0]['keyid'] if user_keys else None,
+            'timestamp': datetime.now().isoformat()
+        }),
+        signed_filename,
+        doc_id
+    ))
+    conn.commit()
+    conn.close()
+
+    flash('Documento assinado com GPG com sucesso!', 'success')
+    return send_file(signed_path, as_attachment=True)
 
 @app.route('/verify', methods=['GET', 'POST'])
 @login_required
@@ -417,6 +513,49 @@ def verify():
                            uploaded_by=original['username'] if original else None)
     
     return render_template('verify.html')
+
+@app.route('/document/<int:doc_id>/verify')
+@login_required
+def verify_signature(doc_id):
+    conn = get_db()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT filename, signature_info FROM documentos 
+        WHERE id = %s AND user_id = %s
+    """, (doc_id, session['user_id']))
+    document = cursor.fetchone()
+    
+    if not document or not document['is_signed']:
+        flash('Documento não assinado', 'danger')
+        return redirect(url_for('document_detail', doc_id=doc_id))
+
+    # Configura GPG
+    gpg = gnupg.GPG(gnupghome=os.path.join(os.getcwd(), 'gnupg'))
+    signed_path = os.path.join(app.config['UPLOAD_FOLDER'], document['filename'])
+    
+    # Verifica a assinatura
+    with open(signed_path, 'rb') as f:
+        verified = gpg.verify_file(f)
+    
+    if verified:
+        flash('Assinatura GPG válida!', 'success')
+    else:
+        flash('Assinatura inválida ou corrompida', 'danger')
+    
+    return redirect(url_for('document_detail', doc_id=doc_id))
+
+@app.route('/gpg/keys')
+@login_required
+def manage_gpg_keys():
+    gpg = gnupg.GPG(gnupghome=os.path.join(os.getcwd(), 'gnupg'))
+    public_keys = gpg.list_keys()
+    private_keys = gpg.list_keys(secret=True)
+    
+    return render_template(
+        'gpg_keys.html',
+        public_keys=public_keys,
+        private_keys=private_keys
+    )
 
 @app.route('/document/<int:doc_id>')
 @login_required
