@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Documentos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --gov-br-blue: #1351b4;
+      --gov-br-blue-dark: #0d3a7a;
+      --gov-br-yellow: #fbc02d;
+      --gov-br-light: #f5f5f5;
+      --gov-br-green: #2e7d32;
+      --gov-br-red: #c62828;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--gov-br-light);
+    }
+
+    .catalog-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+    }
+
+    .catalog-header {
+      background-color: var(--gov-br-blue);
+      color: white;
+      padding: 1.5rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      margin-bottom: 0;
+    }
+
+    .catalog-body {
+      padding: 2rem;
+      background-color: white;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    .filter-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .document-card {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+      height: 100%;
+    }
+
+    .document-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .document-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .document-card .card-footer {
+      background-color: transparent;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .status-badge {
+      padding: 0.35rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .status-verified {
+      background-color: rgba(46, 125, 50, 0.1);
+      color: var(--gov-br-green);
+    }
+
+    .status-pending {
+      background-color: rgba(253, 216, 53, 0.1);
+      color: #b38b00;
+    }
+
+    .status-rejected {
+      background-color: rgba(198, 40, 40, 0.1);
+      color: var(--gov-br-red);
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: var(--gov-br-blue);
+      border-color: var(--gov-br-blue);
+    }
+
+    .pagination .page-link {
+      color: var(--gov-br-blue);
+    }
+
+    .document-icon {
+      font-size: 2rem;
+      color: var(--gov-br-blue);
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+      background-color: var(--gov-br-blue);
+      border-color: var(--gov-br-blue);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--gov-br-blue-dark);
+      border-color: var(--gov-br-blue-dark);
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box .form-control {
+      padding-right: 40px;
+    }
+
+    .search-box .btn {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+     /* Header */
+    .navbar {
+      background-color: var(--gov-br-blue);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 700;
+    }
+    
+    .search-form {
+      max-width: 400px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      color: white;
+      margin-left: 1rem;
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .user-info .dropdown-toggle::after {
+      display: none;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <i class="bi bi-file-earmark-lock-fill me-2"></i>PORTAL DOGERN
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" href="#"><i class="bi bi-house-door me-1"></i> Início</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#"><i class="bi bi-info-circle me-1"></i> Sobre</a>
+          </li>
+        </ul>
+        
+        <form class="d-flex search-form">
+          <div class="input-group">
+            <input class="form-control" type="search" placeholder="Buscar documentos..." aria-label="Search">
+            <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
+          </div>
+        </form>
+        
+        <div class="user-info dropdown">
+          <a href="#" class="dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+            <img src="https://ui-avatars.com/api/?name=J+Silva&background=fff&color=1351b4" alt="Usuário">
+            <span>João Silva</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="catalog-container">
+    <div class="card">
+      <h4 class="catalog-header">
+        <i class="bi bi-archive me-2"></i>Catálogo de Documentos
+      </h4>
+      <div class="catalog-body">
+        <div class="filter-card">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="search-box">
+                <input type="text" class="form-control" id="searchInput" placeholder="Pesquisar documentos...">
+                <button class="btn btn-primary" type="button">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="categoryFilter">
+                <option value="" selected>Todas as categorias</option>
+                <option value="contrato">Contratos</option>
+                <option value="edital">Editais</option>
+                <option value="lei">Leis</option>
+                <option value="portaria">Portarias</option>
+                <option value="relatorio">Relatórios</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="statusFilter">
+                <option value="" selected>Todos os status</option>
+                <option value="verified">Verificados</option>
+                <option value="pending">Pendentes</option>
+                <option value="rejected">Rejeitados</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="startDate" class="form-label">Data inicial</label>
+              <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-4">
+              <label for="endDate" class="form-label">Data final</label>
+              <input type="date" class="form-control" id="endDate">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <button class="btn btn-primary w-100" id="applyFilters">
+                <i class="bi bi-funnel me-2"></i>Aplicar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" id="documentList">
+          <!-- Documentos serão carregados aqui -->
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <h5 class="card-title">Contrato 001/2025</h5>
+                <p class="card-text">Contrato de prestação de serviços com a empresa XYZ.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Contrato</span>
+                  <span class="status-badge status-verified">Verificado</span>
+                </div>
+                <small class="text-muted">Enviado em: 15/07/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-medical"></i>
+                </div>
+                <h5 class="card-title">Relatório Financeiro</h5>
+                <p class="card-text">Relatório trimestral de despesas e receitas.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Relatório</span>
+                  <span class="status-badge status-pending">Pendente</span>
+                </div>
+                <small class="text-muted">Enviado em: 10/07/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-ruled"></i>
+                </div>
+                <h5 class="card-title">Edital 002/2025</h5>
+                <p class="card-text">Edital de licitação para reforma da prefeitura.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Edital</span>
+                  <span class="status-badge status-rejected">Rejeitado</span>
+                </div>
+                <small class="text-muted">Enviado em: 05/07/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <h5 class="card-title">Portaria 123/2025</h5>
+                <p class="card-text">Portaria de nomeação de servidores públicos.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Portaria</span>
+                  <span class="status-badge status-verified">Verificado</span>
+                </div>
+                <small class="text-muted">Enviado em: 01/07/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-lock"></i>
+                </div>
+                <h5 class="card-title">Lei Municipal 456</h5>
+                <p class="card-text">Lei que regulamenta o zoneamento urbano.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Lei</span>
+                  <span class="status-badge status-verified">Verificado</span>
+                </div>
+                <small class="text-muted">Enviado em: 28/06/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card document-card">
+              <div class="card-body">
+                <div class="document-icon">
+                  <i class="bi bi-file-earmark-richtext"></i>
+                </div>
+                <h5 class="card-title">Ata de Reunião</h5>
+                <p class="card-text">Ata da reunião ordinária do conselho municipal.</p>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-secondary">Outros</span>
+                  <span class="status-badge status-pending">Pendente</span>
+                </div>
+                <small class="text-muted">Enviado em: 25/06/2025</small>
+              </div>
+              <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                  <i class="bi bi-eye me-2"></i>Visualizar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Próxima</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Filtros
+    document.getElementById('applyFilters').addEventListener('click', function() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const categoryFilter = document.getElementById('categoryFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      const documentCards = document.querySelectorAll('.document-card');
+      
+      documentCards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const description = card.querySelector('.card-text').textContent.toLowerCase();
+        const category = card.querySelector('.badge').textContent.toLowerCase();
+        const status = card.querySelector('.status-badge').textContent.toLowerCase();
+        const dateText = card.querySelector('.text-muted').textContent.split(': ')[1];
+        const dateParts = dateText.split('/');
+        const date = new Date(`${dateParts[1]}/${dateParts[0]}/${dateParts[2]}`);
+        
+        let matchesSearch = searchTerm === '' || 
+          title.includes(searchTerm) || 
+          description.includes(searchTerm);
+        
+        let matchesCategory = categoryFilter === '' || 
+          category.includes(categoryFilter.toLowerCase());
+        
+        let matchesStatus = statusFilter === '' || 
+          status.includes(statusFilter.toLowerCase());
+        
+        let matchesDate = true;
+        if (startDate) {
+          const filterStartDate = new Date(startDate);
+          matchesDate = matchesDate && date >= filterStartDate;
+        }
+        if (endDate) {
+          const filterEndDate = new Date(endDate);
+          filterEndDate.setDate(filterEndDate.getDate() + 1); // Inclui o dia final
+          matchesDate = matchesDate && date <= filterEndDate;
+        }
+        
+        if (matchesSearch && matchesCategory && matchesStatus && matchesDate) {
+          card.parentElement.style.display = 'block';
+        } else {
+          card.parentElement.style.display = 'none';
+        }
+      });
+    });
+
+    // Pesquisa ao pressionar Enter
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('applyFilters').click();
+      }
+    });
+  </script>
+</body>
+
+</html>
