@@ -189,29 +189,48 @@
       margin-bottom: 1rem;
     }
 
-    .verification-method {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
+    .analysis-details {
+      margin-top: 1.5rem;
+    }
+
+    .analysis-item {
+      display: flex;
       margin-bottom: 1rem;
-      cursor: pointer;
-      transition: all 0.3s;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eee;
     }
 
-    .verification-method:hover {
-      border-color: var(--gov-br-blue);
-      background-color: rgba(19, 81, 180, 0.05);
+    .analysis-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
-    .verification-method.active {
-      border-color: var(--gov-br-blue);
-      background-color: rgba(19, 81, 180, 0.1);
+    .analysis-icon {
+      margin-right: 1rem;
+      font-size: 1.25rem;
     }
 
-    .method-icon {
-      font-size: 1.5rem;
-      margin-right: 0.5rem;
-      color: var(--gov-br-blue);
+    .analysis-icon.valid {
+      color: var(--gov-br-green);
+    }
+
+    .analysis-icon.invalid {
+      color: var(--gov-br-red);
+    }
+
+    .analysis-content {
+      flex-grow: 1;
+    }
+
+    .analysis-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .analysis-description {
+      color: #666;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -222,14 +241,14 @@
     <div class="verification-card">
       <div class="verification-header">
         <h4><i class="bi bi-file-earmark-check me-2"></i> Verificação de Documentos</h4>
-        <p class="mb-0">Confira a autenticidade e integridade de documentos públicos</p>
+        <p class="mb-0">Análise de autenticidade por Inteligência Artificial</p>
       </div>
       
       <div class="verification-body">
-        <!-- Seção de Upload (etapa 1) -->
+        <!-- Seção de Upload -->
         <div id="uploadSection">
-          <h5 class="mb-3">1. Selecione o documento para verificação</h5>
-          <p>Envie o documento que deseja verificar ou cole o código de verificação único.</p>
+          <h5 class="mb-3">Envie o documento para análise</h5>
+          <p>Nosso sistema de IA irá analisar e verificar a autenticidade do documento.</p>
           
           <div class="upload-area" id="dropArea">
             <div class="upload-icon">
@@ -243,23 +262,9 @@
             </button>
           </div>
           
-          <div class="text-center my-3">
-            <p class="text-muted">OU</p>
-          </div>
-          
-          <div class="mb-3">
-            <label for="verificationCode" class="form-label">Código de Verificação</label>
-            <div class="input-group">
-              <input type="text" class="form-control" id="verificationCode" placeholder="Digite o código de 12 caracteres">
-              <button class="btn btn-primary" type="button" id="verifyCodeBtn">
-                <i class="bi bi-search me-1"></i>Verificar
-              </button>
-            </div>
-          </div>
-          
-         <div class="d-grid gap-2 mt-4">
-            <button class="btn btn-primary" id="proceedToMethodBtn" disabled>
-              Continuar <i class="bi bi-arrow-right ms-2"></i>
+          <div class="d-grid gap-2 mt-4">
+            <button class="btn btn-primary" id="analyzeBtn" disabled>
+                Analisar Documento
             </button>
             <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
               <i class="bi bi-arrow-left me-2"></i>Voltar
@@ -267,76 +272,14 @@
           </div>
         </div>
         
-        <!-- Seção de Método de Verificação (etapa 2) - Inicialmente oculta -->
-        <div id="methodSection" class="d-none">
-          <h5 class="mb-3">2. Escolha o método de verificação</h5>
-          <p>Selecione como deseja verificar a autenticidade do documento:</p>
-          
-          <div class="row">
-            <div class="col-md-6">
-              <div class="verification-method" data-method="blockchain">
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-link-45deg method-icon"></i>
-                  <div>
-                    <h6 class="mb-1">Verificação por Blockchain</h6>
-                    <p class="mb-0 text-muted">Confirme a integridade através do registro imutável</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="verification-method" data-method="assinatura">
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-pen method-icon"></i>
-                  <div>
-                    <h6 class="mb-1">Verificação por Assinatura</h6>
-                    <p class="mb-0 text-muted">Valide as assinaturas digitais no documento</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="verification-method" data-method="qrCode">
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-qr-code method-icon"></i>
-                  <div>
-                    <h6 class="mb-1">Verificação por QR Code</h6>
-                    <p class="mb-0 text-muted">Digitalize o código de verificação no documento</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="verification-method" data-method="ia">
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-robot method-icon"></i>
-                  <div>
-                    <h6 class="mb-1">Análise por IA</h6>
-                    <p class="mb-0 text-muted">Detecção de alterações e inconsistências</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="d-flex justify-content-between mt-4">
-            <button class="btn btn-outline-secondary" id="backToUploadBtn">
-              <i class="bi bi-arrow-left me-2"></i>Voltar
-            </button>
-            <button class="btn btn-primary" id="proceedToVerifyBtn" disabled>
-              Verificar Documento <i class="bi bi-check-circle ms-2"></i>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Seção de Resultados (etapa 3) - Inicialmente oculta -->
-        <div id="resultSection" class="d-none">
+        <!-- Seção de Resultados - Documento Válido -->
+        <div id="validResultSection" class="d-none">
           <div class="text-center mb-4">
             <div class="verification-icon verification-success">
               <i class="bi bi-check-circle-fill"></i>
             </div>
-            <h3>Documento Verificado com Sucesso!</h3>
-            <p class="lead">O documento é autêntico e não sofreu alterações.</p>
+            <h3>Documento Autêntico</h3>
+            <p class="lead">A análise por IA confirmou que este documento é verídico.</p>
           </div>
           
           <div class="verification-steps">
@@ -344,63 +287,60 @@
               <div class="step-number">1</div>
               <div class="step-content">
                 <div class="step-title">Documento carregado</div>
-                <div class="step-description">Contrato_Serviços_2025.pdf</div>
+                <div class="step-description" id="validFileName">Contrato_Serviços_2025.pdf</div>
               </div>
             </div>
             <div class="step completed">
               <div class="step-number">2</div>
               <div class="step-content">
-                <div class="step-title">Método de verificação selecionado</div>
-                <div class="step-description">Validação por Blockchain</div>
+                <div class="step-title">Análise por IA realizada</div>
+                <div class="step-description">Técnicas avançadas de detecção de fraudes</div>
               </div>
             </div>
             <div class="step completed">
               <div class="step-number">3</div>
               <div class="step-content">
-                <div class="step-title">Hash do documento confirmado</div>
-                <div class="step-description">a1b2c3d4e5f6...7890</div>
-              </div>
-            </div>
-            <div class="step completed">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <div class="step-title">Assinaturas validadas</div>
-                <div class="step-description">3 assinaturas verificadas</div>
+                <div class="step-title">Resultado da análise</div>
+                <div class="step-description">Documento autêntico sem indícios de alteração</div>
               </div>
             </div>
           </div>
           
           <div class="verification-result result-valid">
-            <h5><i class="bi bi-check-circle-fill me-2"></i>Resultado da Verificação</h5>
-            <p>Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.</p>
+            <h5><i class="bi bi-check-circle-fill me-2"></i>Resultado da Análise</h5>
+            <p>Nossa inteligência artificial analisou o documento e não encontrou indícios de falsificação ou adulteração.</p>
           </div>
           
-          <div class="document-preview">
-            <h6>Informações do Documento</h6>
-            <div class="document-metadata">
-              <div class="metadata-item">
-                <div class="metadata-label">Título:</div>
-                <div class="metadata-value">Contrato de Prestação de Serviços 2025</div>
+          <div class="analysis-details">
+            <h6 class="mb-3">Detalhes da Análise:</h6>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon valid">
+                <i class="bi bi-check-circle-fill"></i>
               </div>
-              <div class="metadata-item">
-                <div class="metadata-label">Tipo:</div>
-                <div class="metadata-value">Contrato Administrativo</div>
+              <div class="analysis-content">
+                <div class="analysis-title">Padrões de impressão consistentes</div>
+                <div class="analysis-description">Os elementos gráficos e textuais seguem padrões oficiais</div>
               </div>
-              <div class="metadata-item">
-                <div class="metadata-label">Número:</div>
-                <div class="metadata-value">045/2025</div>
+            </div>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon valid">
+                <i class="bi bi-check-circle-fill"></i>
               </div>
-              <div class="metadata-item">
-                <div class="metadata-label">Órgão:</div>
-                <div class="metadata-value">Prefeitura Municipal de Natal</div>
+              <div class="analysis-content">
+                <div class="analysis-title">Assinaturas validadas</div>
+                <div class="analysis-description">As assinaturas correspondem aos padrões oficiais</div>
               </div>
-              <div class="metadata-item">
-                <div class="metadata-label">Data:</div>
-                <div class="metadata-value">10/07/2025</div>
+            </div>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon valid">
+                <i class="bi bi-check-circle-fill"></i>
               </div>
-              <div class="metadata-item">
-                <div class="metadata-label">Código:</div>
-                <div class="metadata-value">DOC-RN-2025-7A8B9C</div>
+              <div class="analysis-content">
+                <div class="analysis-title">Texto consistente</div>
+                <div class="analysis-description">Nenhuma evidência de adulteração textual</div>
               </div>
             </div>
           </div>
@@ -419,6 +359,94 @@
             </div>
           </div>
         </div>
+        
+        <!-- Seção de Resultados - Documento Falso -->
+        <div id="invalidResultSection" class="d-none">
+          <div class="text-center mb-4">
+            <div class="verification-icon verification-danger">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <h3>Documento Possivelmente Falsificado</h3>
+            <p class="lead">A análise por IA identificou indícios de adulteração.</p>
+          </div>
+          
+          <div class="verification-steps">
+            <div class="step completed">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-title">Documento carregado</div>
+                <div class="step-description" id="invalidFileName">Contrato_Serviços_2025.pdf</div>
+              </div>
+            </div>
+            <div class="step completed">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-title">Análise por IA realizada</div>
+                <div class="step-description">Técnicas avançadas de detecção de fraudes</div>
+              </div>
+            </div>
+            <div class="step failed">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-title">Resultado da análise</div>
+                <div class="step-description">Indícios de adulteração encontrados</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="verification-result result-invalid">
+            <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Resultado da Análise</h5>
+            <p>Nossa inteligência artificial identificou possíveis alterações no documento que indicam falsificação.</p>
+          </div>
+          
+          <div class="analysis-details">
+            <h6 class="mb-3">Problemas Encontrados:</h6>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon invalid">
+                <i class="bi bi-x-circle-fill"></i>
+              </div>
+              <div class="analysis-content">
+                <div class="analysis-title">Inconsistências nas assinaturas</div>
+                <div class="analysis-description">Padrões de assinatura não correspondem aos originais</div>
+              </div>
+            </div>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon invalid">
+                <i class="bi bi-x-circle-fill"></i>
+              </div>
+              <div class="analysis-content">
+                <div class="analysis-title">Texto adulterado</div>
+                <div class="analysis-description">Evidências de alteração em partes do conteúdo</div>
+              </div>
+            </div>
+            
+            <div class="analysis-item">
+              <div class="analysis-icon invalid">
+                <i class="bi bi-x-circle-fill"></i>
+              </div>
+              <div class="analysis-content">
+                <div class="analysis-title">Elementos gráficos inconsistentes</div>
+                <div class="analysis-description">Selo e carimbos apresentam padrões diferentes do original</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="alert alert-danger mt-4">
+            <i class="bi bi-shield-exclamation me-2"></i>
+            <strong>Atenção:</strong> Este documento apresenta características de falsificação. Recomendamos verificação adicional com os órgãos competentes.
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <button class="btn btn-outline-secondary" id="newVerificationInvalidBtn">
+              <i class="bi bi-arrow-repeat me-2"></i>Nova Verificação
+            </button>
+            <button class="btn btn-danger">
+              <i class="bi bi-flag me-2"></i>Reportar Falsificação
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -427,31 +455,29 @@
   <script>
     // Variáveis de estado
     let currentFile = null;
-    let selectedMethod = null;
     
     // Elementos da interface
     const uploadSection = document.getElementById('uploadSection');
-    const methodSection = document.getElementById('methodSection');
-    const resultSection = document.getElementById('resultSection');
-    const proceedToMethodBtn = document.getElementById('proceedToMethodBtn');
-    const proceedToVerifyBtn = document.getElementById('proceedToVerifyBtn');
-    const verifyCodeBtn = document.getElementById('verifyCodeBtn');
-    const backToUploadBtn = document.getElementById('backToUploadBtn');
+    const validResultSection = document.getElementById('validResultSection');
+    const invalidResultSection = document.getElementById('invalidResultSection');
+    const analyzeBtn = document.getElementById('analyzeBtn');
     const newVerificationBtn = document.getElementById('newVerificationBtn');
+    const newVerificationInvalidBtn = document.getElementById('newVerificationInvalidBtn');
     const fileInput = document.getElementById('fileInput');
     const dropArea = document.getElementById('dropArea');
-    const verificationMethods = document.querySelectorAll('.verification-method');
+    const validFileName = document.getElementById('validFileName');
+    const invalidFileName = document.getElementById('invalidFileName');
     
     // Evento de seleção de arquivo
     fileInput.addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
         currentFile = e.target.files[0];
-        proceedToMethodBtn.disabled = false;
+        analyzeBtn.disabled = false;
         
         // Atualizar a área de upload para mostrar o arquivo selecionado
         dropArea.innerHTML = `
-          <div class="upload-icon text-success">
-            <i class="bi bi-file-earmark-check"></i>
+          <div class="upload-icon">
+            <i class="bi bi-file-earmark-text"></i>
           </div>
           <h5>${currentFile.name}</h5>
           <p class="text-muted">${formatFileSize(currentFile.size)}</p>
@@ -462,63 +488,56 @@
       }
     });
     
-    // Evento para verificar código
-    verifyCodeBtn.addEventListener('click', function() {
-      const code = document.getElementById('verificationCode').value.trim();
-      if (code.length === 12) {
-        // Simular verificação do código
-        simulateVerification(code);
-      } else {
-        alert('Por favor, insira um código de verificação válido de 12 caracteres.');
-      }
+    // Evento para analisar documento
+    analyzeBtn.addEventListener('click', function() {
+      // Mostrar loading
+      analyzeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Analisando...';
+      analyzeBtn.disabled = true;
+      
+      // Simular tempo de análise (2 segundos)
+      setTimeout(() => {
+        // Decidir aleatoriamente se o documento é válido ou não (para demonstração)
+        const isValid = Math.random() > 0.3; // 70% de chance de ser válido
+        
+        // Configurar nome do arquivo nos resultados
+        validFileName.textContent = currentFile.name;
+        invalidFileName.textContent = currentFile.name;
+        
+        if (isValid) {
+          // Mostrar resultado válido
+          uploadSection.classList.add('d-none');
+          validResultSection.classList.remove('d-none');
+        } else {
+          // Mostrar resultado inválido
+          uploadSection.classList.add('d-none');
+          invalidResultSection.classList.remove('d-none');
+        }
+        
+        // Restaurar botão (embora esteja oculto agora)
+        analyzeBtn.innerHTML = '<i class="bi bi-robot me-2"></i>Analisar Documento';
+        analyzeBtn.disabled = false;
+      }, 2000);
     });
     
-    // Evento para continuar para seleção de método
-    proceedToMethodBtn.addEventListener('click', function() {
-      uploadSection.classList.add('d-none');
-      methodSection.classList.remove('d-none');
-    });
-    
-    // Evento para voltar ao upload
-    backToUploadBtn.addEventListener('click', function() {
-      methodSection.classList.add('d-none');
-      uploadSection.classList.remove('d-none');
-    });
-    
-    // Evento para nova verificação
+    // Evento para nova verificação (resultado válido)
     newVerificationBtn.addEventListener('click', function() {
-      resultSection.classList.add('d-none');
+      validResultSection.classList.add('d-none');
       uploadSection.classList.remove('d-none');
       resetUpload();
     });
     
-    // Evento para selecionar método de verificação
-    verificationMethods.forEach(method => {
-      method.addEventListener('click', function() {
-        // Remover classe active de todos os métodos
-        verificationMethods.forEach(m => m.classList.remove('active'));
-        
-        // Adicionar classe active ao método selecionado
-        this.classList.add('active');
-        selectedMethod = this.getAttribute('data-method');
-        proceedToVerifyBtn.disabled = false;
-      });
-    });
-    
-    // Evento para iniciar verificação
-    proceedToVerifyBtn.addEventListener('click', function() {
-      methodSection.classList.add('d-none');
-      resultSection.classList.remove('d-none');
-      
-      // Simular processo de verificação
-      simulateVerificationProcess();
+    // Evento para nova verificação (resultado inválido)
+    newVerificationInvalidBtn.addEventListener('click', function() {
+      invalidResultSection.classList.add('d-none');
+      uploadSection.classList.remove('d-none');
+      resetUpload();
     });
     
     // Função para resetar o upload
     function resetUpload() {
       currentFile = null;
       fileInput.value = '';
-      proceedToMethodBtn.disabled = true;
+      analyzeBtn.disabled = true;
       
       // Restaurar a área de upload ao estado original
       dropArea.innerHTML = `
@@ -542,84 +561,6 @@
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-    
-    // Função para simular verificação por código
-    function simulateVerification(code) {
-      // Mostrar loading
-      verifyCodeBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Verificando...';
-      verifyCodeBtn.disabled = true;
-      
-      // Simular tempo de verificação
-      setTimeout(() => {
-        // Aqui você normalmente faria uma requisição AJAX para verificar o código
-        // Estamos simulando um código válido para demonstração
-        if (code === 'DOCRN2025ABC' || code === '123456789XYZ') {
-          uploadSection.classList.add('d-none');
-          resultSection.classList.remove('d-none');
-          
-          // Configurar resultado para código verificado
-          document.querySelector('.verification-icon').className = 'verification-icon verification-success';
-          document.querySelector('.verification-icon i').className = 'bi bi-check-circle-fill';
-          document.querySelector('#resultSection h3').textContent = 'Documento Verificado com Sucesso!';
-          document.querySelector('#resultSection .lead').textContent = 'O documento é autêntico e não sofreu alterações.';
-          document.querySelector('.verification-result').className = 'verification-result result-valid';
-          document.querySelector('.verification-result h5 i').className = 'bi bi-check-circle-fill me-2';
-          document.querySelector('.verification-result p').innerHTML = 'Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.';
-          
-          // Configurar metadados do documento
-          document.querySelector('.metadata-value:nth-child(1)').textContent = 'Contrato de Prestação de Serviços 2025';
-          document.querySelector('.metadata-value:nth-child(2)').textContent = 'Contrato Administrativo';
-          document.querySelector('.metadata-value:nth-child(3)').textContent = '045/2025';
-          document.querySelector('.metadata-value:nth-child(4)').textContent = 'Prefeitura Municipal de Natal';
-          document.querySelector('.metadata-value:nth-child(5)').textContent = '10/07/2025';
-          document.querySelector('.metadata-value:nth-child(6)').textContent = code;
-        } else {
-          alert('Código de verificação inválido. Por favor, tente novamente.');
-        }
-        
-        // Restaurar botão
-        verifyCodeBtn.innerHTML = '<i class="bi bi-search me-1"></i>Verificar';
-        verifyCodeBtn.disabled = false;
-      }, 1500);
-    }
-    
-    // Função para simular processo de verificação
-    function simulateVerificationProcess() {
-      // Mostrar loading
-      proceedToVerifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Verificando...';
-      proceedToVerifyBtn.disabled = true;
-      
-      // Simular tempo de verificação
-      setTimeout(() => {
-        // Aqui você normalmente faria a verificação real do documento
-        // Estamos simulando um resultado positivo para demonstração
-        
-        // Configurar etapas de verificação
-        const steps = document.querySelectorAll('.step');
-        steps.forEach(step => step.classList.add('completed'));
-        
-        // Configurar resultado
-        document.querySelector('.verification-icon').className = 'verification-icon verification-success';
-        document.querySelector('.verification-icon i').className = 'bi bi-check-circle-fill';
-        document.querySelector('#resultSection h3').textContent = 'Documento Verificado com Sucesso!';
-        document.querySelector('#resultSection .lead').textContent = 'O documento é autêntico e não sofreu alterações.';
-        document.querySelector('.verification-result').className = 'verification-result result-valid';
-        document.querySelector('.verification-result h5 i').className = 'bi bi-check-circle-fill me-2';
-        document.querySelector('.verification-result p').innerHTML = 'Este documento foi registrado no sistema em <strong>15/07/2025 às 14:32</strong> e não sofreu alterações desde então.';
-        
-        // Configurar metadados do documento
-        document.querySelector('.metadata-value:nth-child(1)').textContent = currentFile.name.replace('.pdf', '').replace(/_/g, ' ');
-        document.querySelector('.metadata-value:nth-child(2)').textContent = 'Documento Oficial';
-        document.querySelector('.metadata-value:nth-child(3)').textContent = 'DOC-' + Math.floor(Math.random() * 1000);
-        document.querySelector('.metadata-value:nth-child(4)').textContent = 'Órgão Público do RN';
-        document.querySelector('.metadata-value:nth-child(5)').textContent = new Date().toLocaleDateString();
-        document.querySelector('.metadata-value:nth-child(6)').textContent = 'DOC-RN-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        
-        // Restaurar botão
-        proceedToVerifyBtn.innerHTML = 'Verificar Documento <i class="bi bi-check-circle ms-2"></i>';
-        proceedToVerifyBtn.disabled = false;
-      }, 2000);
     }
     
     // Drag and drop functionality
