@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Enviar Documento para Assinatura</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ document['original_filename'] }}</h5>
+            <p class="card-text">Enviado em: {{ document['upload_date'].strftime('%d/%m/%Y %H:%M') }}</p>
+        </div>
+    </div>
+
+    <form method="POST">
+        <div class="mb-3">
+            <label for="recipient_id" class="form-label">Destinatário:</label>
+            <select class="form-select" id="recipient_id" name="recipient_id" required>
+                <option value="">Selecione um usuário...</option>
+                {% for user in users %}
+                    <option value="{{ user['id'] }}">{{ user['username'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="message" class="form-label">Mensagem (opcional):</label>
+            <textarea class="form-control" id="message" name="message" rows="3" 
+                      placeholder="Adicione instruções ou informações importantes"></textarea>
+        </div>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{{ url_for('document_detail', doc_id=document['id']) }}" class="btn btn-secondary me-md-2">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Enviar para Assinatura</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
