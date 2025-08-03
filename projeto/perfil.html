@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +17,7 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--gov-br-light);
+      padding-top: 56px; /* Adicionado para compensar a navbar fixa */
     }
 
     .profile-container {
@@ -25,36 +25,53 @@
       margin: 2rem auto;
     }
 
-    .profile-header {
-      background-color: var(--gov-br-blue);
-      color: white;
-      padding: 1.5rem;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      text-align: center;
-    }
+.profile-header {
+  background-color: var(--gov-br-blue);
+  color: white;
+  padding: 1.5rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  text-align: center;
+  position: relative;
+  padding-bottom: 80px; /* Espaço extra para a foto */
+  margin-bottom: 40px; /* Metade da altura da foto */
+}
 
-    .profile-body {
-      padding: 2rem;
-      background-color: white;
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-    }
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  z-index: 10;
+}
 
-    .profile-picture {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+.profile-body {
+  padding: 2rem;
+  background-color: white;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  position: relative; /* Para garantir que fique acima da foto */
+  z-index: 5;
+}
 
-    .profile-picture-container {
-      position: relative;
-      width: fit-content;
-      margin: -75px auto 1rem;
-    }
+/* Ajuste para mobile */
+@media (max-width: 768px) {
+  .profile-header {
+    padding-bottom: 60px;
+    margin-bottom: 30px;
+  }
+  
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+  }
+}
 
     .profile-picture-edit {
       position: absolute;
@@ -102,18 +119,7 @@
       border-color: var(--gov-br-blue-dark);
     }
 
-    @media (max-width: 768px) {
-      .profile-picture {
-        width: 120px;
-        height: 120px;
-      }
-      
-      .profile-picture-container {
-        margin: -60px auto 1rem;
-      }
-    }
-
-        .navbar {
+    .navbar {
       background-color: var(--gov-br-blue);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
@@ -143,11 +149,23 @@
     .user-info .dropdown-toggle::after {
       display: none;
     }
+
+    @media (max-width: 768px) {
+      .profile-picture {
+        width: 120px;
+        height: 120px;
+        margin-top: -60px; /* Ajuste para metade da nova altura */
+      }
+      
+      .profile-body {
+        margin-top: 60px; /* Ajuste para a nova altura da imagem */
+      }
+    }
   </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
       <a class="navbar-brand" href="#">
         <i class="bi bi-file-earmark-lock-fill me-2"></i>PORTAL DOGERN
@@ -191,19 +209,16 @@
     <div class="card shadow-sm">
       <div class="profile-header">
         <h4>Meu Perfil</h4>
+        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+             alt="Foto de perfil" 
+             class="profile-picture" 
+             id="profilePicture">
+        <div class="profile-picture-edit" data-bs-toggle="modal" data-bs-target="#pictureModal">
+          <i class="bi bi-camera"></i>
+        </div>
       </div>
       
       <div class="profile-body">
-        <div class="profile-picture-container">
-          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
-               alt="Foto de perfil" 
-               class="profile-picture" 
-               id="profilePicture">
-          <div class="profile-picture-edit" data-bs-toggle="modal" data-bs-target="#pictureModal">
-            <i class="bi bi-camera"></i>
-          </div>
-        </div>
-
         <div class="text-center mb-4">
           <h3>João da Silva</h3>
           <p class="text-muted">Servidor Público - Prefeitura de Natal</p>
@@ -511,5 +526,4 @@
     });
   </script>
 </body>
-
 </html>
