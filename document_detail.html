@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes do Documento{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalhes do Documento</h2>
+    
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ document['original_filename'] }}</h5>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p><strong>Enviado por:</strong> {{ document['username'] }}</p>
+                    <p><strong>Data de upload:</strong> {{ document['upload_date'].strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p><strong>Hash:</strong> <code>{{ document['hash'] }}</code></p>
+                </div>
+                
+                <div class="col-md-6">
+                    {% if document['metadata'] and document['metadata'] is mapping %}
+                    <h5>Metadados:</h5>
+                    <ul class="list-unstyled">
+                        {% for key, value in document['metadata'].items() %}
+                            {% if value %}
+                            <li><strong>{{ key|title }}:</strong> {{ value }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% elif document['metadata'] %}
+                    <div class="alert alert-warning">Formato de metadados inválido</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{{ url_for('sign_document', doc_id=document['id']) }}" class="btn btn-success">
+                    Assinar Documento
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    Voltar
+                </a>
+                <a href="{{ url_for('download_document', doc_id=document['id']) }}" class="btn btn-primary">
+                    Baixar Documento
+                </a>
+                <a href="{{ url_for('send_to_sign', doc_id=document['id']) }}" class="btn btn-primary">
+                    Enviar para Assinatura
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
