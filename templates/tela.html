@@ -39,6 +39,24 @@
     .search-form {
       max-width: 400px;
     }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      color: white;
+      margin-left: 1rem;
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .user-info .dropdown-toggle::after {
+      display: none;
+    }
     
     /* Hero Section */
     .hero {
@@ -95,19 +113,6 @@
       padding: 1.5rem;
       height: 120px;
       object-fit: contain;
-    }
-    
-    /* Login Card */
-    .login-card {
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .login-card .card-header {
-      background-color: var(--gov-br-blue);
-      color: white;
-      font-weight: bold;
     }
     
     /* Document List */
@@ -194,6 +199,11 @@
         margin-top: 1rem;
         max-width: 100%;
       }
+
+      .user-info {
+        margin-top: 1rem;
+        margin-left: 0;
+      }
     }
     
     @media (max-width: 768px) {
@@ -256,20 +266,48 @@
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" href="#"><i class="bi bi-house-door me-1"></i> Início</a>
+            <a class="nav-link active" href="tela.html"><i class="bi bi-house-door me-1"></i> Início</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#"><i class="bi bi-info-circle me-1"></i> Sobre</a>
           </li>
         </ul>
+        
         <form class="d-flex search-form">
           <div class="input-group">
             <input class="form-control" type="search" placeholder="Buscar documentos..." aria-label="Search">
             <button class="btn btn-light" type="submit"><i class="bi bi-search"></i></button>
           </div>
         </form>
-        <div class="ms-3">
-          <a href="{{ url_for('login') }}" class="btn btn-warning"><i class="bi bi-box-arrow-in-right me-1"></i> Acesso Restrito</a>
+        
+        <div class="dropdown user-info">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
+                id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <!-- Avatar gerado a partir do nome -->
+                <img src="https://ui-avatars.com/api/?name={{ nome_completo|urlencode }}&background=fff&color=1351b4" 
+                    alt="Usuário" class="rounded-circle me-2" width="32" height="32">
+                <span>{{ nome_completo }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="userDropdown">
+                <li>
+                <a class="dropdown-item" href="{{ url_for('perfil') }}">
+                    <i class="bi bi-person me-2"></i> Meu Perfil
+                </a>
+                </li>
+                <li><a class="dropdown-item"></a></li>
+                <li>
+                <a class="dropdown-item" href="{{ url_for('logout') }}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Sair
+                </a>
+                </li>
+            </ul>
+        </div>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="perfil.html"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="login.html"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -279,13 +317,19 @@
     <!-- Hero Section -->
     <section class="hero animate__animated animate__fadeIn">
       <div class="container position-relative">
-        <h1 class="animate__animated animate__fadeInDown">Portal de Documentos Públicos do RN</h1>
-        <p class="animate__animated animate__fadeIn animate__delay-1s">Digitalização segura, verificação automatizada e transparência nos documentos públicos do Rio Grande do Norte.</p>
+        <h1 class="animate__animated animate__fadeInDown">Bem-vindo ao Portal de Documentos Públicos</h1>
+        <p class="animate__animated animate__fadeIn animate__delay-1s">Acesse, consulte e gerencie documentos públicos com transparência e segurança.</p>
         <div class="animate__animated animate__fadeIn animate__delay-2s">
-          <a class="btn btn-warning me-2 mb-2" href="{{ url_for('login') }}"><i class="bi bi-box-arrow-in-right me-1"></i> Acessar Sistema</a>
+            <a class="btn btn-warning me-2 mb-2" href="{{ url_for('upload') }}">
+                <i class="bi bi-cloud-arrow-up me-2"></i> Enviar Documento
+            </a>
+            <a class="btn btn-outline-light mb-2" href="{{ url_for('verify') }}">
+                <i class="bi bi-search me-2"></i> Consultar Documentos
+            </a>
         </div>
       </div>
     </section>
+
 
     <!-- Features Section -->
     <section class="row g-4 mb-5">
@@ -331,7 +375,7 @@
     <section class="mb-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Últimos Documentos Publicados</h2>
-        <a href="login.html" class="btn btn-sm btn-outline-primary">Ver todos</a>
+        <a href="catalogo.html" class="btn btn-sm btn-outline-primary">Ver todos</a>
       </div>
       <div class="card">
         <div class="card-body">
@@ -419,52 +463,6 @@
       </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="mb-5">
-      <h2 class="mb-4">Perguntas Frequentes</h2>
-      <div class="accordion" id="faqAccordion">
-        <div class="accordion-item mb-3 border-0">
-          <h3 class="accordion-header" id="headingOne">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-              Quem pode usar o sistema?
-            </button>
-          </h3>
-          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-            <div class="accordion-body">
-              Servidores públicos autorizados podem cadastrar e gerenciar documentos. Cidadãos têm acesso à consulta pública de documentos e funcionalidades de verificação. Para acessar áreas restritas, é necessário cadastro com validação de identidade.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item mb-3 border-0">
-          <h3 class="accordion-header" id="headingTwo">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-              Como são identificadas fraudes nos documentos?
-            </button>
-          </h3>
-          <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-            <div class="accordion-body">
-              Utilizamos uma combinação de tecnologias: blockchain para garantir a integridade dos documentos digitais, inteligência artificial para análise de padrões e detecção de alterações em imagens digitalizadas, e verificação cruzada com bancos de dados oficiais.
-            </div>
-          </div>
-        </div>
-        <div class="accordion-item mb-3 border-0">
-          <h3 class="accordion-header" id="headingThree">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
-              Como denunciar um documento suspeito?
-            </button>
-          </h3>
-          <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-            <div class="accordion-body">
-              Você pode fazer denúncias através da nossa ouvidoria online. Basta acessar a seção "Ouvidoria", preencher o formulário com os detalhes do documento suspeito e anexar quaisquer evidências. Todas as denúncias são analisadas e você pode acompanhar o status pelo sistema.
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-4">
-        <a href="#" class="btn btn-outline-primary">Ver todas as perguntas</a>
-      </div>
-    </section>
-
     <!-- Contact Section -->
     <section class="text-center mb-5">
       <div class="card border-0 bg-light">
@@ -489,8 +487,8 @@
           <h5>Links</h5>
           <ul class="footer-links">
             <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Início</a></li>
-            <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Documentos</a></li>
-            <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Verificação</a></li>
+            <li><a href="catalogo.html"><i class="bi bi-chevron-right me-1"></i> Documentos</a></li>
+            <li><a href="verificar.html"><i class="bi bi-chevron-right me-1"></i> Verificação</a></li>
             <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Estatísticas</a></li>
           </ul>
         </div>

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Minhas Notificações{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Minhas Notificações</h2>
+    
+    <!-- Aba de navegação -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if not filter_read %}active{% endif %}" 
+               href="{{ url_for('notifications') }}?filter=unread">
+                Não lidas
+                {% if unread_count > 0 %}
+                <span class="badge bg-danger ms-1">{{ unread_count }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if filter_read %}active{% endif %}" 
+               href="{{ url_for('notifications') }}?filter=read">
+                Lidas
+            </a>
+        </li>
+    </ul>
+
+    <!-- Lista de notificações -->
+    <div class="list-group">
+        {% for notification in notifications %}
+        <a href="{% if not notification.lida %}{{ url_for('mark_notification_as_read', notification_id=notification.id) }}{% else %}#{% endif %}" 
+           class="list-group-item list-group-item-action {% if not notification.lida %}list-group-item-primary{% endif %}">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">{{ notification.mensagem }}</h6>
+                <small>{{ notification.criada_em.strftime('%d/%m/%Y %H:%M') }}</small>
+            </div>
+            {% if notification.document['id'] %}
+            <small>Documento: {{ notification.original_filename or 'N/A' }}</small>
+            {% endif %}
+            {% if not notification.lida %}
+            <span class="badge bg-primary float-end">Nova</span>
+            {% endif %}
+        </a>
+        {% else %}
+        <div class="alert alert-info">Nenhuma notificação encontrada</div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginação (opcional) -->
+    {% if pagination %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('notifications', page=pagination.prev_num, filter=request.args.get('filter')) }}">
+                    &laquo; Anterior
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in pagination.iter_pages() %}
+            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('notifications', page=page_num, filter=request.args.get('filter')) }}">
+                    {{ page_num }}
+                </a>
+            </li>
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('notifications', page=pagination.next_num, filter=request.args.get('filter')) }}">
+                    Próxima &raquo;
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
